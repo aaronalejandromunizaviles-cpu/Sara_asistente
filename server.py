@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify
-
 import requests
 import os
 
@@ -25,16 +24,18 @@ def home():
             body: JSON.stringify({message: mensaje})
         });
 
-        let data = await res.json();
-
-        document.getElementById("respuesta").innerText = data.reply;
+        if (res.ok) {
+            let data = await res.json();
+            document.getElementById("respuesta").innerText = data.reply;
+        } else {
+            document.getElementById("respuesta").innerText = "Error al conectar con SARA.";
+        }
     }
     </script>
     """
 
 @app.route("/chat", methods=["POST"])
 def chat():
-
     user_message = request.json.get("message")
 
     headers = {
@@ -62,9 +63,11 @@ def chat():
         json=data
     )
 
-    reply = response.json()["choices"][0]["message"]["content"]
-
-    return jsonify({"reply": reply})
+    if response.status_code == 200:
+        reply = response.json()["choices"][0]["message"]["content"]
+        return jsonify({"reply": reply})
+    else:
+        return jsonify({"reply": "Hubo un error al contactar a SARA."}), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
