@@ -1,19 +1,40 @@
 from flask import Flask, request, jsonify
+
 import requests
 import os
 
 app = Flask(__name__)
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY")
-VOICE_ID = os.environ.get("VOICE_ID")
 
 @app.route("/")
 def home():
-    return "SARA está viva"
+    return """
+    <h2>SARA está viva</h2>
+    <input id='msg' placeholder='Habla con SARA'>
+    <button onclick='enviar()'>Enviar</button>
+    <p id='respuesta'></p>
+
+    <script>
+    async function enviar() {
+        let mensaje = document.getElementById("msg").value;
+
+        let res = await fetch("/chat", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({message: mensaje})
+        });
+
+        let data = await res.json();
+
+        document.getElementById("respuesta").innerText = data.reply;
+    }
+    </script>
+    """
 
 @app.route("/chat", methods=["POST"])
 def chat():
+
     user_message = request.json.get("message")
 
     headers = {
@@ -24,8 +45,14 @@ def chat():
     data = {
         "model": "gpt-4o-mini",
         "messages": [
-            {"role": "system", "content": "Eres SARA, una asistente femenina, inteligente, calmada, segura, natural y humana."},
-            {"role": "user", "content": user_message}
+            {
+                "role": "system",
+                "content": "Eres SARA, una asistente femenina, inteligente, calmada, natural, humana y profesional."
+            },
+            {
+                "role": "user",
+                "content": user_message
+            }
         ]
     }
 
