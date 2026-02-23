@@ -36,6 +36,7 @@ def home():
 
 @app.route("/chat", methods=["POST"])
 def chat():
+
     user_message = request.json.get("message")
 
     headers = {
@@ -45,7 +46,7 @@ def chat():
 
     data = {
         "model": "gpt-4o-mini",
-        "messages": [
+        "input": [
             {
                 "role": "system",
                 "content": "Eres SARA, una asistente femenina, inteligente, calmada, natural, humana y profesional."
@@ -58,16 +59,18 @@ def chat():
     }
 
     response = requests.post(
-        "https://api.openai.com/v1/chat/completions",
+        "https://api.openai.com/v1/responses",
         headers=headers,
         json=data
     )
 
     if response.status_code == 200:
-        reply = response.json()["choices"][0]["message"]["content"]
+        reply = response.json()["output"][0]["content"][0]["text"]
         return jsonify({"reply": reply})
     else:
-        return jsonify({"reply": "Hubo un error al contactar a SARA."}), 500
+        print(response.text)
+        return jsonify({"reply": "Error al contactar a SARA"}), 500
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
