@@ -34,7 +34,10 @@ def home():
 
             if (data.audio) {
                 let audio = new Audio("data:audio/mpeg;base64," + data.audio);
-                audio.play();
+
+audio.play().catch(e => {
+    console.log("Autoplay bloqueado:", e);
+});
             }
 
         } catch (error) {
