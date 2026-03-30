@@ -65,13 +65,13 @@ def chat():
         json=data
     )
 
-    if response.status_code == 200:
-        reply = response.json()["choices"][0]["message"]["content"]
-        return jsonify({"reply": reply})
-    else:
-        print(response.text)
-        return jsonify({"reply": "Error con SARA"}), 500
-
+   if response.status_code == 200:
+    reply = response.json()["choices"][0]["message"]["content"]
+    return jsonify({"reply": reply})
+else:
+    error = response.text
+    print("ERROR OPENROUTER:", error)
+    return jsonify({"reply": error}), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
