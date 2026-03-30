@@ -40,9 +40,18 @@ audio.play().catch(e => {
 });
 document.body.addEventListener("click", () => {
     if (data.audio) {
-        let audio = new Audio("data:audio/mpeg;base64," + data.audio);
-        audio.play();
-    }
+    console.log("AUDIO RECIBIDO");
+
+    let audio = new Audio("data:audio/mpeg;base64," + data.audio);
+
+    audio.play().then(() => {
+        console.log("REPRODUCIENDO");
+    }).catch(err => {
+        console.log("ERROR AUDIO:", err);
+    });
+} else {
+    console.log("NO HAY AUDIO");
+}
 });
             }
 
