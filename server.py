@@ -38,6 +38,12 @@ def home():
 audio.play().catch(e => {
     console.log("Autoplay bloqueado:", e);
 });
+document.body.addEventListener("click", () => {
+    if (data.audio) {
+        let audio = new Audio("data:audio/mpeg;base64," + data.audio);
+        audio.play();
+    }
+});
             }
 
         } catch (error) {
