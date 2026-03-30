@@ -15,33 +15,31 @@ def home():
     <p id='respuesta'></p>
 
     <script>
-async function enviar() {
-    try {
-        let mensaje = document.getElementById("msg").value;
+    async function enviar() {
+        try {
+            let mensaje = document.getElementById("msg").value;
 
-        let res = await fetch("/chat", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({message: mensaje})
-        });
+            let res = await fetch("/chat", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({message: mensaje})
+            });
 
-        let data = await res.json();
+            let data = await res.json();
+            document.getElementById("respuesta").innerText = data.reply;
 
-        document.getElementById("respuesta").innerText = data.reply;
-
-    } catch (error) {
-        document.getElementById("respuesta").innerText = "Error en el envío";
-        console.error(error);
+        } catch (error) {
+            document.getElementById("respuesta").innerText = "Error en el envío";
+            console.error(error);
+        }
     }
-}
-</script>
+    </script>
     """
 
 @app.route("/chat", methods=["POST"])
 def chat():
-
     user_message = request.json.get("message")
 
     headers = {
@@ -65,13 +63,14 @@ def chat():
         json=data
     )
 
-   if response.status_code == 200:
-    reply = response.json()["choices"][0]["message"]["content"]
-    return jsonify({"reply": reply})
-else:
-    error = response.text
-    print("ERROR OPENROUTER:", error)
-    return jsonify({"reply": error}), 500
+    if response.status_code == 200:
+        reply = response.json()["choices"][0]["message"]["content"]
+        return jsonify({"reply": reply})
+    else:
+        error = response.text
+        print("ERROR OPENROUTER:", error)
+        return jsonify({"reply": error}), 500
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
