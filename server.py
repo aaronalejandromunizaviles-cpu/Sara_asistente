@@ -73,7 +73,6 @@ def chat():
     if response.status_code == 200:
         reply = response.json()["choices"][0]["message"]["content"]
 
-        # Generar voz con ElevenLabs
         voice_response = requests.post(
             "https://api.elevenlabs.io/v1/text-to-speech/xVsgMHSTwR9ea6G8CXmO",
             headers={
@@ -98,75 +97,6 @@ def chat():
             "audio": audio
         })
 
-    else:
-        error = response.text
-        print("ERROR OPENROUTER:", error)
-        return jsonify({"reply": error}), 500
-
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
-        } catch (error) {
-            document.getElementById("respuesta").innerText = "Error en el envío";
-            console.error(error);
-        }
-    }
-    </script>
-    """
-
-@app.route("/chat", methods=["POST"])
-def chat():
-    user_message = request.json.get("message")
-
-    headers = {
-        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://render.com",
-        "X-Title": "SARA"
-    }
-
-    data = {
-        "model": "openrouter/auto", 
-        "messages": [
-            {"role": "system", "content": "Eres SARA, una asistente inteligente, calmada y natural."},
-            {"role": "user", "content": user_message}
-        ]
-    }
-
-    response = requests.post(
-        "https://openrouter.ai/api/v1/chat/completions",
-        headers=headers,
-        json=data
-    )
-
-    if response.status_code == 200:
-    import base64
-
-    reply = response.json()["choices"][0]["message"]["content"]
-
-    voice_response = requests.post(
-        "https://api.elevenlabs.io/v1/text-to-speech/xVsgMHSTwR9ea6G8CXmO",
-        headers={
-            "xi-api-key": os.environ.get("ELEVENLABS_API_KEY"),
-            "Content-Type": "application/json"
-        },
-        json={
-            "text": reply,
-            "model_id": "eleven_monolingual_v1"
-        }
-    )
-
-    audio = None
-
-    if voice_response.status_code == 200:
-        audio = base64.b64encode(voice_response.content).decode("utf-8")
-    else:
-        print("ERROR VOZ:", voice_response.text)
-
-    return jsonify({
-        "reply": reply,
-        "audio": audio
-    })
     else:
         error = response.text
         print("ERROR OPENROUTER:", error)
