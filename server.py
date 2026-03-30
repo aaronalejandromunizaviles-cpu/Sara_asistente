@@ -15,19 +15,28 @@ def home():
     <p id='respuesta'></p>
 
     <script>
-    async function enviar() {
+async function enviar() {
+    try {
         let mensaje = document.getElementById("msg").value;
 
         let res = await fetch("/chat", {
             method: "POST",
-            headers: {"Content-Type": "application/json"},
+            headers: {
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({message: mensaje})
         });
 
         let data = await res.json();
+
         document.getElementById("respuesta").innerText = data.reply;
+
+    } catch (error) {
+        document.getElementById("respuesta").innerText = "Error en el envío";
+        console.error(error);
     }
-    </script>
+}
+</script>
     """
 
 @app.route("/chat", methods=["POST"])
