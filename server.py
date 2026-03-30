@@ -30,6 +30,11 @@ def home():
             let data = await res.json();
             document.getElementById("respuesta").innerText = data.reply;
 
+if (data.audio) {
+    let audio = new Audio("data:audio/mpeg;base64," + data.audio);
+    audio.play();
+}
+
         } catch (error) {
             document.getElementById("respuesta").innerText = "Error en el envío";
             console.error(error);
@@ -64,8 +69,33 @@ def chat():
     )
 
     if response.status_code == 200:
-        reply = response.json()["choices"][0]["message"]["content"]
-        return jsonify({"reply": reply})
+    import base64
+
+    reply = response.json()["choices"][0]["message"]["content"]
+
+    voice_response = requests.post(
+        "https://api.elevenlabs.io/v1/text-to-speech/xVsgMHSTwR9ea6G8CXmO",
+        headers={
+            "xi-api-key": os.environ.get("ELEVENLABS_API_KEY"),
+            "Content-Type": "application/json"
+        },
+        json={
+            "text": reply,
+            "model_id": "eleven_monolingual_v1"
+        }
+    )
+
+    audio = None
+
+    if voice_response.status_code == 200:
+        audio = base64.b64encode(voice_response.content).decode("utf-8")
+    else:
+        print("ERROR VOZ:", voice_response.text)
+
+    return jsonify({
+        "reply": reply,
+        "audio": audio
+    })
     else:
         error = response.text
         print("ERROR OPENROUTER:", error)
