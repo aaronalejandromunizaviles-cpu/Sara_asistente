@@ -4,13 +4,13 @@ import os
 
 app = Flask(__name__)
 
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY")
 
 @app.route("/")
 def home():
     return """
     <h2>SARA está viva</h2>
-    <input id='msg' placeholder='Habla con SARA'>
+    <input id='msg' placeholder='Escribe algo'>
     <button onclick='enviar()'>Enviar</button>
     <p id='respuesta'></p>
 
@@ -24,12 +24,8 @@ def home():
             body: JSON.stringify({message: mensaje})
         });
 
-        if (res.ok) {
-            let data = await res.json();
-            document.getElementById("respuesta").innerText = data.reply;
-        } else {
-            document.getElementById("respuesta").innerText = "Error al conectar con SARA.";
-        }
+        let data = await res.json();
+        document.getElementById("respuesta").innerText = data.reply;
     }
     </script>
     """
@@ -40,36 +36,32 @@ def chat():
     user_message = request.json.get("message")
 
     headers = {
-        "Authorization": f"Bearer {OPENAI_API_KEY}",
-        "Content-Type": "application/json"
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://render.com",
+        "X-Title": "SARA"
     }
 
     data = {
-        "model": "gpt-4o-mini",
-        "input": [
-            {
-                "role": "system",
-                "content": "Eres SARA, una asistente femenina, inteligente, calmada, natural, humana y profesional."
-            },
-            {
-                "role": "user",
-                "content": user_message
-            }
+        "model": "mistralai/mistral-7b-instruct",
+        "messages": [
+            {"role": "system", "content": "Eres SARA, una asistente inteligente, calmada y natural."},
+            {"role": "user", "content": user_message}
         ]
     }
 
     response = requests.post(
-        "https://api.openai.com/v1/responses",
+        "https://openrouter.ai/api/v1/chat/completions",
         headers=headers,
         json=data
     )
 
     if response.status_code == 200:
-        reply = response.json()["output"][0]["content"][0]["text"]
+        reply = response.json()["choices"][0]["message"]["content"]
         return jsonify({"reply": reply})
     else:
         print(response.text)
-        return jsonify({"reply": "Error al contactar a SARA"}), 500
+        return jsonify({"reply": "Error con SARA"}), 500
 
 
 if __name__ == "__main__":
