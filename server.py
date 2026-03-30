@@ -50,7 +50,7 @@ def chat():
     }
 
     data = {
-        "model": "mistralai/mistral-7b-instruct",
+        "model": "openrouter/auto", 
         "messages": [
             {"role": "system", "content": "Eres SARA, una asistente inteligente, calmada y natural."},
             {"role": "user", "content": user_message}
